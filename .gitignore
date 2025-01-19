@@ -1,0 +1,216 @@
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# JetBrains Rider and Resharper
+.idea/
+*.sln.iml
+*.suo
+*.user
+*.resharper/*
+_ReSharper*/
+*.DotSettings.user
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+.vscode/
+.vscode/*
+
+# Visual Studio code coverage results
+*.coverage
+*.coveragexml
+
+# Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+.vs/
+*.user
+*.suo
+*.csproj.user
+*.fsproj.user
+*.cache/
+*.tlog
+*.exe
+*.dll
+*.ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.vcxproj.user
+*.psess
+*.vsp
+*.vspx
+*.sln.docstates
+*.plg
+*.opt
+*.vbw
+.localhistory/
+
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+# but keep track of directories ending in .cache
+!?*.[Cc]ache/
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# TeamCity is a build add-in
+_TeamCity*
+
+# DotCover is a Code Coverage Tool
+*.dotCover
+
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/[Pp]ackages/repositories.config
+# NuGet v3's project.json files produces more ignorable files
+*.nuget.props
+*.nuget.targets
+
+# Build artifacts
+bin/
+obj/
+*.csproj.user
+*.vbproj.user
+*.fsproj.user
+*.dbmdl
+*.jfm
+*.pdb
+*.mdb
+*.log
+*.pri
+*.pch
+*.rsp
+*.idb
+*.ilk
+*.tlog
+*.lib
+*.dll
+*.exe
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.csx
+*.build.csx
+*.class
+*.jar
+*.war
+*.ear
+*.kotlin_module
+*.dex
+*.apk
+*.ap_
+build/
+out/
+publish/
+artifacts/
+
+# Installshield output folder
+[Ee]xpress/
+
+# DocProject is a documentation generator add-in
+DocProject/buildhelp/
+DocProject/Help/*.HxT
+DocProject/Help/*.HxC
+DocProject/Help/*.hhc
+DocProject/Help/*.hhk
+DocProject/Help/*.hhp
+DocProject/Help/Html2
+DocProject/Help/html
+
+# Click-Once directory
+publish/
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# Publish Web Output
+*.[Pp]ublish.xml
+*.azurePubxml
+# Note: Comment the next line if you want to checkin your web deploy settings,
+# but database connection strings (with potential passwords) will be unencrypted
+*.pubxml
+*.publishproj
+
+# Sensitive or secret files
+appsettings.json
+appsettings.Development.json
+secrets.json
+
+# Local-only files
+*.local
+*.local.*
+Input/*.txt
+
+# Others
+ClientBin/
+~$*
+*~
+*.pfx
+*.publishsettings
+
+# Thumbnails
+._*
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
