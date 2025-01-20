@@ -1,22 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+
+    <PropertyGroup>
+    <OutputType>Library</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
-    <AssemblyName>TrainingModelOAuth</AssemblyName>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>resources\Main.ico</ApplicationIcon>
     <BaseOutputPath>$(RepositoryRoot)bin</BaseOutputPath>
-    <StartupObject>TrainingModelOAuth.Startup.Program</StartupObject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release' AND '$(PublishDir)' != ''">
-    <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>    
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-  </PropertyGroup>
 </Project>

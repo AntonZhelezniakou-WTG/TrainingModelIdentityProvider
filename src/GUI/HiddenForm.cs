@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace TrainingModelOAuth.GUI;
 
-sealed class HiddenForm : Form
+public sealed class HiddenForm : Form
 {
 	const string HiddenFormCaption = "TrainingModelOAuth_19125226-A9B2-4D67-8080-842EBA149E22";
 
@@ -30,7 +30,7 @@ sealed class HiddenForm : Form
 	[DllImport("user32.dll", SetLastError = true)]
 	static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
 
-	public static bool DoesWindowExist() => FindWindow(null, HiddenFormCaption) != IntPtr.Zero;
+	public static bool DoesWindowExist => FindWindow(null, HiddenFormCaption) != IntPtr.Zero;
 
 	void Exit(object? sender, EventArgs eventArgs)
 	{
@@ -42,7 +42,6 @@ sealed class HiddenForm : Form
 			localTrayIcon.Dispose();
 		}
 		Close();
-		Application.Exit();
 	}
 
 	protected override void OnLoad(EventArgs e)
