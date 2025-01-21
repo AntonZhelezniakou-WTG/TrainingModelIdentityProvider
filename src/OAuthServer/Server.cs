@@ -12,22 +12,47 @@ public static class Server
 {
 	const string ServerAddress = "https://localhost:5000";
 	const string ClientIdentifier = "OdysseyTrainingModel";
-	const string SecretKey = "TrainingModelOAuth_1B70DC8C-8EA1-454E-8C9A-FD9F64820E9C";
+	//const string SecretKey = "TrainingModelOAuth_1B70DC8C-8EA1-454E-8C9A-FD9F64820E9C";
 
 	const string ClaimName = "ZelAnton";
 	const string TestRole = "test_user";
 
+	const int TokenLifetime = 1800;
+
 	static IHost? _host;
+	static RSACryptoServiceProvider? _rsaCryptoProvider;
+	static readonly string Kid = "key-id-1";
+
+	const string rsaKey =
+		"""
+		<RSAKeyValue>
+			<Modulus>ztJZUvmpuEE6S8Hc0pfpyEAawf3GE7RClVxv+FTQQN2GPDipbmuJhOfQksX+cgOb8RBnBn+GC3NXGf8vnUx1ytIm1bWAodtagcKt5JDe8IkJJK1wQXe5aAbcT/vC9CaqI9U2PKrPjaoVHoUPvQB/yHpkecT3WumsGcIA4C0UUfjTpRAckRsWX6+y5PAUruyL+Doj0Q6ZC5FfanibK0Crevx7leOugAWFRUMaBotcKgarubf3G4iYzUX+1Q20nGwDOBrNDoRcTyMMpcMSZWyzAVmo47rb90mmacKG75CaNDwnuihROzOiwj4hVzpwcsNYy8XlLYA5RICsEGUv+ylp0Q==</Modulus>
+			<Exponent>AQAB</Exponent>
+			<P>9tzx/Pw/wO9brXhBsxS/c3pU8OiDSvF8chwALmkgcx7F2Y8uLP7ez60xvoYqDuLj2gZK86Od7Z8/YSug52H4Xf4CQL9XyXQdPCWBmdEaltN0kEs74FbjAeZJg8UyCpNoEWMWqbyMWRAcVgwMnfDE1kJB1v5v5m2JAYCnexKenNc=</P>
+			<Q>1noBzq/Fg0U3AAa7mfwkLEopIYzlZntdCxAp7HTADCrAQ8PMTcomqr2aLOHSabCmonUb1wKvpm7YTv7tuxJOEpqSJHFxFTes84g2Pa8kRrfeByjB7xK825UBYfJvbpPYPg11a0HvcVn0yThZOD3MOoWBZt/Sa7gu21oKDPqgcZc=</Q>
+			<DP>e9FQEorW00d63SQPF+pVKG94QSjuCV3cBEPlF2IlI3iQ1dFJ4MmpKdL9u0kBuVu12voDB/bN1IxmNq+yUbvC3in0KVOPjXyO2UcanPLTekjvExyZGKmbzK0bvFrhAYrzzJy9lj76ygUZoVMD1QgZQjoTWeleaN4RtM45srIhGhs=</DP>
+			<DQ>s0KWcCIJe4ZGSgdWlYVg1oPFjP0uX1GMmsqPv8p1GbZBrGHiSMJFPz/ptMmqDBxRqkcnVbYxCXJr6Nq56DmMd5ApxbvrQEigjYuziirwrwrO0D0ImsGWiBEqbqsq58k6W+Lz2QnrD1qYdfZa298K637agRlhzhbLUxsWe3Ke11E=</DQ>
+			<InverseQ>OIM7Ny3RLHhzti5JEreThzNTigUVLBmozkNNoWekymETW14VJagXf3sWDie/XV1GDcWSos+Q3atbomDftxzNuM4zGWT/jO1IxcclI90CoZp4rtEl5NEUTKJjWyayKqwew6Nhum5xCTXb8LK1vyxS4rvxQGPEElsJkjNd54TH+Bg=</InverseQ>
+			<D>REw+ZyI/I7OWlrHcREcaUqCotWsiYBtk6YHvD+iiJOmCjJyBhw9ICHWs8OslTW1Xr9Gk1AaEs39RQip9BMrdEy8219fqNIkFaFhrqFEW7gOy20PTECuDNJEfa+JNzOZ/xPmBwaL+i1+hPcTfH6Dskb2pNHUQ4hrMVG02cNEyJqcWk/DR3fTIxKf+wl3cAZoctjDi4or04/sBYWX3BJY/wc2+7wWnqEUBUIePA5lYGrfDuiaAMe5dcOzP2YnA6zUNKFTwM87YfHq57cd3mXr7RNCst2OMo7NvwSAMQzZaibkZAaXwVnS3otaqGqHOl7qrAXgG3CorCoVxt+AuEmkT6Q==</D>
+		</RSAKeyValue>
+		""";
 
 	public static void Start()
 	{
+		_rsaCryptoProvider = new RSACryptoServiceProvider();
+		_rsaCryptoProvider.FromXmlString(rsaKey);
+
 		_host = Host.CreateDefaultBuilder()
 			.ConfigureWebHostDefaults(webBuilder =>
 			{
 				webBuilder.UseUrls(ServerAddress);
 				webBuilder.ConfigureServices(services =>
 				{
-					var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+					var rsaParams = _rsaCryptoProvider.ExportParameters(false);
+					var rsaKey = new RsaSecurityKey(rsaParams)
+					{
+						KeyId = Kid,
+					};
 
 					services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 						.AddJwtBearer(options =>
@@ -40,7 +65,7 @@ public static class Server
 								ValidateIssuerSigningKey = true,
 								ValidIssuer = ServerAddress,
 								ValidAudience = ClientIdentifier,
-								IssuerSigningKey = signingKey,
+								IssuerSigningKey = rsaKey,
 							};
 						});
 
@@ -74,6 +99,8 @@ public static class Server
 
 	public static void Stop()
 	{
+		_rsaCryptoProvider?.Dispose();
+		_rsaCryptoProvider = null;
 		_host?.StopAsync().Wait(500);
 		_host?.Dispose();
 		_host = null;
@@ -116,8 +143,7 @@ public static class Server
 
 	static async Task Jwks(HttpContext context)
 	{
-		var rsa = new RSACryptoServiceProvider(2048);
-		var parameters = rsa.ExportParameters(false);
+		var parameters = _rsaCryptoProvider.ExportParameters(false);
 
 		var jwks = new
 		{
@@ -128,7 +154,7 @@ public static class Server
 					kty = "RSA",
 					use = "sig",
 					alg = "RS256",
-					kid = "key-id-1",
+					kid = Kid,
 					n = Base64UrlEncoder.Encode(parameters.Modulus),
 					e = Base64UrlEncoder.Encode(parameters.Exponent),
 				},
@@ -226,11 +252,70 @@ public static class Server
 			}
 		}
 
+		var userId = "ZelAnton";
+		var username = "ZelAnton";
+		var role = "test_user";
+
+		var identityToken = GenerateIdentityToken(userId, username, role);
+		var accessToken = GenerateAccessToken(userId);
+		var accessTokenExpiration = DateTime.UtcNow.AddSeconds(TokenLifetime);
+
+		return Results.Json(new
+		{
+			id_token = identityToken,
+			token_type = "Bearer",
+			access_token = accessToken,
+			access_token_expires_at = accessTokenExpiration,
+			sub = userId,
+			username,
+		});
+	}
+
+	static IResult Userinfo(HttpContext context)
+	{
+		var user = context.User;
+		if (user.Identity?.IsAuthenticated != true)
+		{
+			return Results.Unauthorized();
+		}
+
+		var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user.FindFirst(ClaimTypes.Name)?.Value;
+		if (string.IsNullOrEmpty(userId))
+		{
+			return Results.NotFound();
+		}
+
+		var username = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
+		var role = user.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
+
+		return Results.Json(new
+		{
+			sub = userId,
+			username,
+			role,
+		});
+	}
+
+	static string GenerateAccessToken(string userId)
+	{
 		var tokenHandler = new JwtSecurityTokenHandler();
-		Claim[] claims = [
-			new(JwtRegisteredClaimNames.Sub, "ZelAnton"),
-			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-		];
+
+		var keyParams = _rsaCryptoProvider.ExportParameters(true);
+		var rsaKey = new RsaSecurityKey(keyParams)
+		{
+			KeyId = Kid,
+		};
+
+		var claims = new[]
+		{
+			new Claim(JwtRegisteredClaimNames.Sub, userId),
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim("Login", "ZelAnton"),
+		};
+
+		var signingCredentials = new SigningCredentials(
+			rsaKey,
+			SecurityAlgorithms.RsaSha256Signature);
 
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
@@ -238,40 +323,46 @@ public static class Server
 			Expires = DateTime.UtcNow.AddMinutes(30),
 			Issuer = ServerAddress,
 			Audience = ClientIdentifier,
-			SigningCredentials = new SigningCredentials(
-				new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
-				SecurityAlgorithms.HmacSha256Signature),
+			SigningCredentials = signingCredentials,
 		};
 
-		try
-		{
-			var token = tokenHandler.CreateToken(tokenDescriptor);
-			var tokenString = tokenHandler.WriteToken(token);
-
-			return Results.Json(new { access_token = tokenString, token_type = "Bearer", expires_in = 1800 });
-		}
-		catch (Exception e)
-		{
-			return Results.BadRequest(new { error = "Token generation error", error_description = e.Message });
-		}
+		var token = tokenHandler.CreateToken(tokenDescriptor);
+		return tokenHandler.WriteToken(token);
 	}
 
-	static IResult Userinfo(HttpContext context)
+	static string GenerateIdentityToken(string userId, string username, string role)
 	{
-		var user = context.User;
+		var tokenHandler = new JwtSecurityTokenHandler();
 
-		if (user.Identity?.IsAuthenticated != true)
+		var keyParams = _rsaCryptoProvider.ExportParameters(true);
+		var rsaKey = new RsaSecurityKey(keyParams)
 		{
-			return Results.Unauthorized();
-		}
+			KeyId = Kid,
+		};
 
-		var userName = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-		return Results.Json(new
+		var claims = new[]
 		{
-			username = userName ?? "Unknown",
-			password = "123",
-			role = TestRole,
-		});
+			new Claim(JwtRegisteredClaimNames.Sub, userId),
+			new Claim(JwtRegisteredClaimNames.Name, username),
+			new Claim(ClaimTypes.Role, role),
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim("Login", "ZelAnton"),
+		};
+
+		var signingCredentials = new SigningCredentials(
+			rsaKey,
+			SecurityAlgorithms.RsaSha256Signature);
+
+		var tokenDescriptor = new SecurityTokenDescriptor
+		{
+			Subject = new ClaimsIdentity(claims),
+			Expires = DateTime.UtcNow.AddMinutes(30),
+			Issuer = ServerAddress,
+			Audience = ClientIdentifier,
+			SigningCredentials = signingCredentials,
+		};
+
+		var token = tokenHandler.CreateToken(tokenDescriptor);
+		return tokenHandler.WriteToken(token);
 	}
 }
