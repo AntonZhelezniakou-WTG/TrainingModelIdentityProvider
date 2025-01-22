@@ -65,9 +65,9 @@ public static class Server
 					app.Use(DebuggingMiddleware);
 
 					app.UseHttpsRedirection();
+					app.UseRouting();
 					app.UseAuthentication();
 					app.UseAuthorization();
-					app.UseRouting();
 
 					app.UseEndpoints(endpoints =>
 					{
@@ -75,7 +75,7 @@ public static class Server
 						endpoints.MapGet("/.well-known/jwks.json", Jwks);
 						endpoints.MapGet("/authorize", Authorize);
 						endpoints.MapPost("/token", (Func<HttpContext, Task<IResult>>)Token);
-						endpoints.MapGet("/userinfo", Userinfo); //.RequireAuthorization();
+						endpoints.MapGet("/userinfo", Userinfo).RequireAuthorization();
 					});
 				});
 			})
@@ -94,14 +94,6 @@ public static class Server
 	static async Task DebuggingMiddleware(HttpContext context, Func<Task> next)
 	{
 		Console.WriteLine($"Incoming request: {context.Request.Method} {context.Request.Path}");
-
-		if (context.Request.Path == "/blocked")
-		{
-			context.Response.StatusCode = 403;
-			await context.Response.WriteAsync("Access denied to /blocked");
-			return;
-		}
-
 		await next();
 	}
 
