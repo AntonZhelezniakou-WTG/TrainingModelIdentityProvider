@@ -12,18 +12,15 @@ public static class Server
 {
 	const string ServerAddress = "https://localhost:5000";
 	const string ClientIdentifier = "OdysseyTrainingModel";
-	//const string SecretKey = "TrainingModelOAuth_1B70DC8C-8EA1-454E-8C9A-FD9F64820E9C";
-
-	const string ClaimName = "ZelAnton";
-	const string TestRole = "test_user";
-
 	const int TokenLifetime = 1800;
 
+	const string UserName = "ZelAnton";
+
 	static IHost? _host;
-	static RSACryptoServiceProvider? _rsaCryptoProvider;
+	static readonly RSACryptoServiceProvider CryptoProvider = new();
 	static readonly string Kid = "key-id-1";
 
-	const string rsaKey =
+	const string RsaKeyXml =
 		"""
 		<RSAKeyValue>
 			<Modulus>ztJZUvmpuEE6S8Hc0pfpyEAawf3GE7RClVxv+FTQQN2GPDipbmuJhOfQksX+cgOb8RBnBn+GC3NXGf8vnUx1ytIm1bWAodtagcKt5JDe8IkJJK1wQXe5aAbcT/vC9CaqI9U2PKrPjaoVHoUPvQB/yHpkecT3WumsGcIA4C0UUfjTpRAckRsWX6+y5PAUruyL+Doj0Q6ZC5FfanibK0Crevx7leOugAWFRUMaBotcKgarubf3G4iYzUX+1Q20nGwDOBrNDoRcTyMMpcMSZWyzAVmo47rb90mmacKG75CaNDwnuihROzOiwj4hVzpwcsNYy8XlLYA5RICsEGUv+ylp0Q==</Modulus>
@@ -39,8 +36,7 @@ public static class Server
 
 	public static void Start()
 	{
-		_rsaCryptoProvider = new RSACryptoServiceProvider();
-		_rsaCryptoProvider.FromXmlString(rsaKey);
+		CryptoProvider.FromXmlString(RsaKeyXml);
 
 		_host = Host.CreateDefaultBuilder()
 			.ConfigureWebHostDefaults(webBuilder =>
@@ -48,7 +44,7 @@ public static class Server
 				webBuilder.UseUrls(ServerAddress);
 				webBuilder.ConfigureServices(services =>
 				{
-					var rsaParams = _rsaCryptoProvider.ExportParameters(false);
+					var rsaParams = CryptoProvider.ExportParameters(false);
 					var rsaKey = new RsaSecurityKey(rsaParams)
 					{
 						KeyId = Kid,
@@ -99,8 +95,6 @@ public static class Server
 
 	public static void Stop()
 	{
-		_rsaCryptoProvider?.Dispose();
-		_rsaCryptoProvider = null;
 		_host?.StopAsync().Wait(500);
 		_host?.Dispose();
 		_host = null;
@@ -143,7 +137,7 @@ public static class Server
 
 	static async Task Jwks(HttpContext context)
 	{
-		var parameters = _rsaCryptoProvider.ExportParameters(false);
+		var parameters = CryptoProvider.ExportParameters(false);
 
 		var jwks = new
 		{
@@ -182,7 +176,7 @@ public static class Server
 			return;
 		}
 
-		Claim[] claims = [new (ClaimTypes.Name, ClaimName), new (ClaimTypes.Role, TestRole)];
+		Claim[] claims = [new (ClaimTypes.Name, "test_user"), new (ClaimTypes.Role, "test_user")];
 		var identity = new ClaimsIdentity(claims, "AuthStub");
 		var principal = new ClaimsPrincipal(identity);
 
@@ -204,7 +198,7 @@ public static class Server
 		{
 			RedirectUri = redirectUri,
 			CodeChallenge = codeChallenge,
-		}, TimeSpan.FromMinutes(5));
+		}, TimeSpan.FromMilliseconds(TokenLifetime) + TimeSpan.FromMinutes(2));
 
 		var redirectUrl = $"{redirectUri}?code={authorizationCode}&state={state}";
 		context.Response.Redirect(redirectUrl);
@@ -300,7 +294,7 @@ public static class Server
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
 
-		var keyParams = _rsaCryptoProvider.ExportParameters(true);
+		var keyParams = CryptoProvider.ExportParameters(true);
 		var rsaKey = new RsaSecurityKey(keyParams)
 		{
 			KeyId = Kid,
@@ -310,7 +304,6 @@ public static class Server
 		{
 			new Claim(JwtRegisteredClaimNames.Sub, userId),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim("Login", "ZelAnton"),
 		};
 
 		var signingCredentials = new SigningCredentials(
@@ -334,7 +327,7 @@ public static class Server
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
 
-		var keyParams = _rsaCryptoProvider.ExportParameters(true);
+		var keyParams = CryptoProvider.ExportParameters(true);
 		var rsaKey = new RsaSecurityKey(keyParams)
 		{
 			KeyId = Kid,
@@ -346,7 +339,7 @@ public static class Server
 			new Claim(JwtRegisteredClaimNames.Name, username),
 			new Claim(ClaimTypes.Role, role),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim("Login", "ZelAnton"),
+			new Claim("Login", UserName),
 		};
 
 		var signingCredentials = new SigningCredentials(
