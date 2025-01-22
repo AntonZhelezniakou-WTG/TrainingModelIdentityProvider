@@ -280,7 +280,7 @@ public sealed class Server(IServerConfigurationProvider serverConfigurationProvi
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(claims),
-			Expires = DateTime.UtcNow.AddMilliseconds(TokenLifetime),
+			Expires = DateTime.UtcNow.AddMinutes(30),
 			Issuer = ListeningAddress,
 			Audience = ClientIdentifier,
 			SigningCredentials = Encryption.SigningCredentials,
