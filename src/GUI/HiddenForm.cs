@@ -8,9 +8,12 @@ public sealed class HiddenForm : Form
 
 	NotifyIcon? trayIcon;
 	readonly ContextMenuStrip trayMenu;
+	readonly ServerConfiguration serverConfiguration;
 
-	public HiddenForm()
+	public HiddenForm(ServerConfiguration serverConfiguration)
 	{
+		this.serverConfiguration = serverConfiguration;
+
 		Text = HiddenFormCaption;
 		WindowState = FormWindowState.Minimized;
 		ShowInTaskbar = false;

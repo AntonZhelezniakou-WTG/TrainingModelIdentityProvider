@@ -8,53 +8,35 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TrainingModelOAuth;
 
-public static class Server
+public sealed class Server(IServerConfigurationProvider serverConfigurationProvider) : IServer
 {
-	const string ServerAddress = "https://localhost:5000";
 	const string ClientIdentifier = "OdysseyTrainingModel";
 	const int TokenLifetime = 1800;
-	const string Kid = "key-id-1";
 
-	const string UserName = "ZelAnton";
+	public bool Started { get; private set; }
 
-	static IHost? _host;
-	static readonly RSACryptoServiceProvider CryptoProvider = new();
+	string ListeningAddress => $"https://localhost:{ActiveConfiguration!.ListeningPort}";
+	string StaffLoginName => ActiveConfiguration!.StaffLoginName;
 
-	public static void Start()
+	public ServerConfiguration? ActiveConfiguration { get; private set; }
+
+	IHost? host;
+
+	Encryption Encryption => lazyEncryption.Value;
+	readonly Lazy<Encryption> lazyEncryption = new(() => new Encryption());
+
+	public void Start()
 	{
-		using (var stream = typeof(Server).Assembly.GetManifestResourceStream("OAuthServer.Properties.RsaKey.xml"))
-		using (var reader = new StreamReader(stream!))
-		{
-			var rsaKeyXml = reader.ReadToEnd();
-			CryptoProvider.FromXmlString(rsaKeyXml);
-		}
+		ActiveConfiguration = serverConfigurationProvider.GetConfiguration().GetValidated();
 
-		_host = Host.CreateDefaultBuilder()
+		host = Host.CreateDefaultBuilder()
 			.ConfigureWebHostDefaults(webBuilder =>
 			{
-				webBuilder.UseUrls(ServerAddress);
+				webBuilder.UseUrls(ListeningAddress);
 				webBuilder.ConfigureServices(services =>
 				{
-					var rsaParams = CryptoProvider.ExportParameters(false);
-					var rsaKey = new RsaSecurityKey(rsaParams)
-					{
-						KeyId = Kid,
-					};
-
 					services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-						.AddJwtBearer(options =>
-						{
-							options.TokenValidationParameters = new TokenValidationParameters
-							{
-								ValidateIssuer = true,
-								ValidateAudience = true,
-								ValidateLifetime = true,
-								ValidateIssuerSigningKey = true,
-								ValidIssuer = ServerAddress,
-								ValidAudience = ClientIdentifier,
-								IssuerSigningKey = rsaKey,
-							};
-						});
+						.AddJwtBearer(GetJwtBearerConfigureOptions);
 
 					services.AddAuthorization();
 					services.AddMemoryCache();
@@ -81,14 +63,30 @@ public static class Server
 			})
 			.Build();
 
-		_host.Start();
+		host.Start();
+		Started = true;
 	}
 
-	public static void Stop()
+	void GetJwtBearerConfigureOptions(JwtBearerOptions options)
 	{
-		_host?.StopAsync().Wait(500);
-		_host?.Dispose();
-		_host = null;
+		options.TokenValidationParameters = new TokenValidationParameters {
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = ListeningAddress,
+			ValidAudience = ClientIdentifier,
+			IssuerSigningKey = Encryption.Key,
+		};
+	}
+
+	public void Stop()
+	{
+		Started = false;
+		ActiveConfiguration = null;
+		host?.StopAsync().Wait(500);
+		host?.Dispose();
+		host = null;
 	}
 
 	static async Task DebuggingMiddleware(HttpContext context, Func<Task> next)
@@ -109,7 +107,7 @@ public static class Server
 			jwks_uri = $"{baseUrl}/.well-known/jwks.json",
 			response_types_supported = new[] { "code", "token", "id_token", "code id_token", "code token" },
 			subject_types_supported = new[] { "public" },
-			id_token_signing_alg_values_supported = new[] { "RS256" },
+			id_token_signing_alg_values_supported = new[] { Encryption.Algorithm },
 			scopes_supported = new[] { "openid", "profile", "email" },
 			token_endpoint_auth_methods_supported = new[] { "client_secret_basic", "client_secret_post" },
 		};
@@ -118,9 +116,9 @@ public static class Server
 		await context.Response.WriteAsJsonAsync(metadata);
 	}
 
-	static async Task Jwks(HttpContext context)
+	async Task Jwks(HttpContext context)
 	{
-		var parameters = CryptoProvider.ExportParameters(false);
+		var parameters = Encryption.CryptoProvider.ExportParameters(false);
 
 		var jwks = new
 		{
@@ -128,10 +126,10 @@ public static class Server
 			{
 				new
 				{
-					kty = "RSA",
-					use = "sig",
-					alg = "RS256",
-					kid = Kid,
+					kty = Encryption.KeyType,
+					use = Encryption.KeyUse,
+					alg = Encryption.Algorithm,
+					kid = Encryption.KeyID,
 					n = Base64UrlEncoder.Encode(parameters.Modulus),
 					e = Base64UrlEncoder.Encode(parameters.Exponent),
 				},
@@ -142,7 +140,7 @@ public static class Server
 		await context.Response.WriteAsJsonAsync(jwks);
 	}
 
-	static async Task Authorize(HttpContext context)
+	async Task Authorize(HttpContext context)
 	{
 		var responseType = context.Request.Query["response_type"];
 		var clientId = context.Request.Query["client_id"];
@@ -159,7 +157,7 @@ public static class Server
 			return;
 		}
 
-		Claim[] claims = [new (ClaimTypes.Name, UserName)];
+		Claim[] claims = [new (ClaimTypes.Name, StaffLoginName)];
 		var identity = new ClaimsIdentity(claims, "AuthStub");
 		var principal = new ClaimsPrincipal(identity);
 
@@ -187,7 +185,7 @@ public static class Server
 		context.Response.Redirect(redirectUrl);
 	}
 
-	static async Task<IResult> Token(HttpContext context)
+	async Task<IResult> Token(HttpContext context)
 	{
 		var form = await context.Request.ReadFormAsync();
 
@@ -229,8 +227,8 @@ public static class Server
 			}
 		}
 
-		var identityToken = GenerateIdentityToken(userId: UserName, username: UserName);
-		var accessToken = GenerateAccessToken(UserName);
+		var identityToken = GenerateIdentityToken(userId: StaffLoginName, username: StaffLoginName);
+		var accessToken = GenerateAccessToken(StaffLoginName);
 		var accessTokenExpiration = DateTime.UtcNow.AddSeconds(TokenLifetime);
 
 		return Results.Json(new
@@ -239,8 +237,8 @@ public static class Server
 			token_type = "Bearer",
 			access_token = accessToken,
 			access_token_expires_at = accessTokenExpiration,
-			sub = UserName,
-			username = UserName,
+			sub = StaffLoginName,
+			username = StaffLoginName,
 		});
 	}
 
@@ -269,15 +267,9 @@ public static class Server
 		});
 	}
 
-	static string GenerateAccessToken(string userId)
+	string GenerateAccessToken(string userId)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
-
-		var keyParams = CryptoProvider.ExportParameters(true);
-		var rsaKey = new RsaSecurityKey(keyParams)
-		{
-			KeyId = Kid,
-		};
 
 		var claims = new[]
 		{
@@ -285,52 +277,38 @@ public static class Server
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 		};
 
-		var signingCredentials = new SigningCredentials(
-			rsaKey,
-			SecurityAlgorithms.RsaSha256Signature);
-
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(claims),
 			Expires = DateTime.UtcNow.AddMinutes(30),
-			Issuer = ServerAddress,
+			Issuer = ListeningAddress,
 			Audience = ClientIdentifier,
-			SigningCredentials = signingCredentials,
+			SigningCredentials = Encryption.SigningCredentials,
 		};
 
 		var token = tokenHandler.CreateToken(tokenDescriptor);
 		return tokenHandler.WriteToken(token);
 	}
 
-	static string GenerateIdentityToken(string userId, string username)
+	string GenerateIdentityToken(string userId, string username)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
-
-		var keyParams = CryptoProvider.ExportParameters(true);
-		var rsaKey = new RsaSecurityKey(keyParams)
-		{
-			KeyId = Kid,
-		};
 
 		var claims = new[]
 		{
 			new Claim(JwtRegisteredClaimNames.Sub, userId),
 			new Claim(JwtRegisteredClaimNames.Name, username),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim("Login", UserName),
+			new Claim("Login", StaffLoginName),
 		};
-
-		var signingCredentials = new SigningCredentials(
-			rsaKey,
-			SecurityAlgorithms.RsaSha256Signature);
 
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(claims),
 			Expires = DateTime.UtcNow.AddMinutes(30),
-			Issuer = ServerAddress,
+			Issuer = ListeningAddress,
 			Audience = ClientIdentifier,
-			SigningCredentials = signingCredentials,
+			SigningCredentials = Encryption.SigningCredentials,
 		};
 
 		var token = tokenHandler.CreateToken(tokenDescriptor);

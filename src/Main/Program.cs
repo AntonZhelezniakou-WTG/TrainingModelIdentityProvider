@@ -5,7 +5,9 @@ namespace TrainingModelOAuth.Startup;
 static class Program
 {
 	const string SingletonMutexName = "TrainingModelOAuth_Run_503A9F8E-6C05-4415-B4C7-035D19B3EA36";
-	const string Url = "http://localhost:5000";
+
+	const int DefaultPort = 5000;
+	const string DefaultUserName = "ZelAnton";
 
 	[STAThread]
 	static void Main()
@@ -20,9 +22,13 @@ static class Program
 
 		ApplicationConfiguration.Initialize();
 
-		var hiddenForm = new HiddenForm();
-		hiddenForm.FormClosed += (_, _) => Server.Stop();
-		Server.Start();
+		var serverConfiguration = new ServerConfiguration(ListeningPort: DefaultPort, StaffLoginName: DefaultUserName);
+		var hiddenForm = new HiddenForm(serverConfiguration);
+		var server = new Server(serverConfiguration);
+
+		hiddenForm.FormClosed += (_, _) => server.Stop();
+		hiddenForm.HandleCreated += (_, _) => server.Start();
+
 		Application.Run(hiddenForm);
 	}
 }
