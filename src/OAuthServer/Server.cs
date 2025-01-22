@@ -167,7 +167,7 @@ public static class Server
 			return;
 		}
 
-		Claim[] claims = [new (ClaimTypes.Name, "test_user"), new (ClaimTypes.Role, "test_user")];
+		Claim[] claims = [new (ClaimTypes.Name, UserName)];
 		var identity = new ClaimsIdentity(claims, "AuthStub");
 		var principal = new ClaimsPrincipal(identity);
 
@@ -237,12 +237,8 @@ public static class Server
 			}
 		}
 
-		var userId = "ZelAnton";
-		var username = "ZelAnton";
-		var role = "test_user";
-
-		var identityToken = GenerateIdentityToken(userId, username, role);
-		var accessToken = GenerateAccessToken(userId);
+		var identityToken = GenerateIdentityToken(userId: UserName, username: UserName);
+		var accessToken = GenerateAccessToken(UserName);
 		var accessTokenExpiration = DateTime.UtcNow.AddSeconds(TokenLifetime);
 
 		return Results.Json(new
@@ -251,8 +247,8 @@ public static class Server
 			token_type = "Bearer",
 			access_token = accessToken,
 			access_token_expires_at = accessTokenExpiration,
-			sub = userId,
-			username,
+			sub = UserName,
+			username = UserName,
 		});
 	}
 
@@ -314,7 +310,7 @@ public static class Server
 		return tokenHandler.WriteToken(token);
 	}
 
-	static string GenerateIdentityToken(string userId, string username, string role)
+	static string GenerateIdentityToken(string userId, string username)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -328,7 +324,6 @@ public static class Server
 		{
 			new Claim(JwtRegisteredClaimNames.Sub, userId),
 			new Claim(JwtRegisteredClaimNames.Name, username),
-			new Claim(ClaimTypes.Role, role),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 			new Claim("Login", UserName),
 		};
