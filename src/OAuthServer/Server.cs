@@ -229,7 +229,7 @@ public sealed class Server(IServerConfigurationProvider serverConfigurationProvi
 
 		var identityToken = GenerateIdentityToken(userId: StaffLoginName, username: StaffLoginName);
 		var accessToken = GenerateAccessToken(StaffLoginName);
-		var accessTokenExpiration = DateTime.UtcNow.AddSeconds(TokenLifetime);
+		var accessTokenExpiration = DateTime.UtcNow.AddMilliseconds(TokenLifetime);
 
 		return Results.Json(new
 		{
@@ -280,7 +280,7 @@ public sealed class Server(IServerConfigurationProvider serverConfigurationProvi
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(claims),
-			Expires = DateTime.UtcNow.AddMinutes(30),
+			Expires = DateTime.UtcNow.AddMilliseconds(TokenLifetime),
 			Issuer = ListeningAddress,
 			Audience = ClientIdentifier,
 			SigningCredentials = Encryption.SigningCredentials,
