@@ -13,30 +13,21 @@ public static class Server
 	const string ServerAddress = "https://localhost:5000";
 	const string ClientIdentifier = "OdysseyTrainingModel";
 	const int TokenLifetime = 1800;
+	const string Kid = "key-id-1";
 
 	const string UserName = "ZelAnton";
 
 	static IHost? _host;
 	static readonly RSACryptoServiceProvider CryptoProvider = new();
-	static readonly string Kid = "key-id-1";
-
-	const string RsaKeyXml =
-		"""
-		<RSAKeyValue>
-			<Modulus>ztJZUvmpuEE6S8Hc0pfpyEAawf3GE7RClVxv+FTQQN2GPDipbmuJhOfQksX+cgOb8RBnBn+GC3NXGf8vnUx1ytIm1bWAodtagcKt5JDe8IkJJK1wQXe5aAbcT/vC9CaqI9U2PKrPjaoVHoUPvQB/yHpkecT3WumsGcIA4C0UUfjTpRAckRsWX6+y5PAUruyL+Doj0Q6ZC5FfanibK0Crevx7leOugAWFRUMaBotcKgarubf3G4iYzUX+1Q20nGwDOBrNDoRcTyMMpcMSZWyzAVmo47rb90mmacKG75CaNDwnuihROzOiwj4hVzpwcsNYy8XlLYA5RICsEGUv+ylp0Q==</Modulus>
-			<Exponent>AQAB</Exponent>
-			<P>9tzx/Pw/wO9brXhBsxS/c3pU8OiDSvF8chwALmkgcx7F2Y8uLP7ez60xvoYqDuLj2gZK86Od7Z8/YSug52H4Xf4CQL9XyXQdPCWBmdEaltN0kEs74FbjAeZJg8UyCpNoEWMWqbyMWRAcVgwMnfDE1kJB1v5v5m2JAYCnexKenNc=</P>
-			<Q>1noBzq/Fg0U3AAa7mfwkLEopIYzlZntdCxAp7HTADCrAQ8PMTcomqr2aLOHSabCmonUb1wKvpm7YTv7tuxJOEpqSJHFxFTes84g2Pa8kRrfeByjB7xK825UBYfJvbpPYPg11a0HvcVn0yThZOD3MOoWBZt/Sa7gu21oKDPqgcZc=</Q>
-			<DP>e9FQEorW00d63SQPF+pVKG94QSjuCV3cBEPlF2IlI3iQ1dFJ4MmpKdL9u0kBuVu12voDB/bN1IxmNq+yUbvC3in0KVOPjXyO2UcanPLTekjvExyZGKmbzK0bvFrhAYrzzJy9lj76ygUZoVMD1QgZQjoTWeleaN4RtM45srIhGhs=</DP>
-			<DQ>s0KWcCIJe4ZGSgdWlYVg1oPFjP0uX1GMmsqPv8p1GbZBrGHiSMJFPz/ptMmqDBxRqkcnVbYxCXJr6Nq56DmMd5ApxbvrQEigjYuziirwrwrO0D0ImsGWiBEqbqsq58k6W+Lz2QnrD1qYdfZa298K637agRlhzhbLUxsWe3Ke11E=</DQ>
-			<InverseQ>OIM7Ny3RLHhzti5JEreThzNTigUVLBmozkNNoWekymETW14VJagXf3sWDie/XV1GDcWSos+Q3atbomDftxzNuM4zGWT/jO1IxcclI90CoZp4rtEl5NEUTKJjWyayKqwew6Nhum5xCTXb8LK1vyxS4rvxQGPEElsJkjNd54TH+Bg=</InverseQ>
-			<D>REw+ZyI/I7OWlrHcREcaUqCotWsiYBtk6YHvD+iiJOmCjJyBhw9ICHWs8OslTW1Xr9Gk1AaEs39RQip9BMrdEy8219fqNIkFaFhrqFEW7gOy20PTECuDNJEfa+JNzOZ/xPmBwaL+i1+hPcTfH6Dskb2pNHUQ4hrMVG02cNEyJqcWk/DR3fTIxKf+wl3cAZoctjDi4or04/sBYWX3BJY/wc2+7wWnqEUBUIePA5lYGrfDuiaAMe5dcOzP2YnA6zUNKFTwM87YfHq57cd3mXr7RNCst2OMo7NvwSAMQzZaibkZAaXwVnS3otaqGqHOl7qrAXgG3CorCoVxt+AuEmkT6Q==</D>
-		</RSAKeyValue>
-		""";
 
 	public static void Start()
 	{
-		CryptoProvider.FromXmlString(RsaKeyXml);
+		using (var stream = typeof(Server).Assembly.GetManifestResourceStream("OAuthServer.Properties.RsaKey.xml"))
+		using (var reader = new StreamReader(stream!))
+		{
+			var rsaKeyXml = reader.ReadToEnd();
+			CryptoProvider.FromXmlString(rsaKeyXml);
+		}
 
 		_host = Host.CreateDefaultBuilder()
 			.ConfigureWebHostDefaults(webBuilder =>
