@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <OutputType>Library</OutputType>
-        <RootNamespace>TrainingModelOAuth</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>TrainingModelOAuth.Interfaces</AssemblyName>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
 
 </Project>

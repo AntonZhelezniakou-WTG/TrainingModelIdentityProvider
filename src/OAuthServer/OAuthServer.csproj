@@ -1,16 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>TrainingModelOAuth.Server</AssemblyName>
     <OutputType>Library</OutputType>
-    <RootNamespace>TrainingModelOAuth</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Properties\RsaKey.xml" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Properties\RsaKey.xml" />
@@ -23,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
+    <ProjectReference Include="$(SolutionRoot)\Interfaces\Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

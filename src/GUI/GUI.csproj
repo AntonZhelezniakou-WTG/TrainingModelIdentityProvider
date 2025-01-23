@@ -1,17 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
+  <PropertyGroup>    
+    <AssemblyName>TrainingModelOAuth.GUI</AssemblyName>
     <OutputType>Library</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <BaseOutputPath>$(RepositoryRoot)bin</BaseOutputPath>
-    <RootNamespace>TrainingModelOAuth</RootNamespace>
   </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
+      <ProjectReference Include="$(SolutionRoot)\Interfaces\Interfaces.csproj" />
     </ItemGroup>
 
 </Project>

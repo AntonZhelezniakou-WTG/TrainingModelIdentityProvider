@@ -1,16 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <AssemblyName>TrainingModelOAuth</AssemblyName>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0-windows</TargetFramework>
-        <AssemblyName>TrainingModelOAuth</AssemblyName>
-        <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
-        <ImplicitUsings>enable</ImplicitUsings>
         <ApplicationIcon>resources\Main.ico</ApplicationIcon>
-        <BaseOutputPath>$(RepositoryRoot)bin</BaseOutputPath>
         <StartupObject>TrainingModelOAuth.Startup.Program</StartupObject>
-        <RootNamespace>TrainingModelOAuth</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' AND '$(PublishDir)' != ''">
@@ -23,9 +19,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GUI\GUI.csproj" />
-      <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
-      <ProjectReference Include="..\OAuthServer\OAuthServer.csproj" />
+      <ProjectReference Include="$(SolutionRoot)\GUI\GUI.csproj" />
+      <ProjectReference Include="$(SolutionRoot)\Interfaces\Interfaces.csproj" />
+      <ProjectReference Include="$(SolutionRoot)\OAuthServer\OAuthServer.csproj" />
     </ItemGroup>
 
 </Project>

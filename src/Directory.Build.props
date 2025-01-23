@@ -6,11 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Tailcalls>true</Tailcalls>
+    <RootNamespace>TrainingModelOAuth</RootNamespace>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup>
     <RepositoryRoot>$(MSBuildThisFileDirectory)..\</RepositoryRoot>
+    <SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BaseOutputPath>$(RepositoryRoot)bin</BaseOutputPath>
   </PropertyGroup>
 </Project>
