@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>TrainingModelOAuth.Configuration</AssemblyName>
+        <AssemblyName>TrainingModelIdentityProvider.Configuration</AssemblyName>
         <OutputType>Library</OutputType>
-        <RootNamespace>TrainingModelOAuth</RootNamespace>
+        <RootNamespace>TrainingModelIdentityProvider</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
+      <ProjectReference Include="$(SolutionRoot)\Interfaces\Interfaces.csproj" />
     </ItemGroup>
 </Project>

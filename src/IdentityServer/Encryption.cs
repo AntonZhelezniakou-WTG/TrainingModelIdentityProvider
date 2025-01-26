@@ -1,7 +1,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
-namespace TrainingModelOAuth;
+namespace TrainingModelIdentityProvider;
 
 sealed class Encryption
 {
@@ -13,7 +13,7 @@ sealed class Encryption
 	public Encryption()
 	{
 		CryptoProvider = new RSACryptoServiceProvider();
-		using var stream = typeof(Server).Assembly.GetManifestResourceStream("TrainingModelOAuth.Properties.RsaKey.xml");
+		using var stream = typeof(Server).Assembly.GetManifestResourceStream("TrainingModelIdentityProvider.Properties.RsaKey.xml");
 		using var reader = new StreamReader(stream!);
 		var rsaKeyXml = reader.ReadToEnd();
 		CryptoProvider.FromXmlString(rsaKeyXml);

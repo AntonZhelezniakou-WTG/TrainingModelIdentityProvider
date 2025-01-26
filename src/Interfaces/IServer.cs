@@ -1,4 +1,4 @@
-namespace TrainingModelOAuth;
+namespace TrainingModelIdentityProvider;
 
 public interface IServer
 {

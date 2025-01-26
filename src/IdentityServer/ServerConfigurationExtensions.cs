@@ -1,7 +1,7 @@
 using System.Net.Sockets;
 using System.Net;
 
-namespace TrainingModelOAuth;
+namespace TrainingModelIdentityProvider;
 
 static class ServerConfigurationExtensions
 {

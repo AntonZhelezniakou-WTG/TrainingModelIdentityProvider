@@ -1,10 +1,10 @@
 using System.Runtime.InteropServices;
 
-namespace TrainingModelOAuth.GUI;
+namespace TrainingModelIdentityProvider.GUI;
 
 public sealed partial class SystemTrayForm : Form
 {
-	const string HiddenFormCaption = "TrainingModelOAuth_19125226-A9B2-4D67-8080-842EBA149E22";
+	const string HiddenFormCaption = "TrainingModelIdentityProvider_19125226-A9B2-4D67-8080-842EBA149E22";
 
 	NotifyIcon? trayIcon = new();
 	readonly ContextMenuStrip trayMenu;

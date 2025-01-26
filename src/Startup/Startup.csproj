@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>TrainingModelOAuth</AssemblyName>
+        <AssemblyName>TrainingModelIdentityProvider</AssemblyName>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-        <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
+        <TargetFramework>net9.0-windows</TargetFramework>
         <ApplicationManifest>Properties/app.manifest</ApplicationManifest>
         <UseWinUI>true</UseWinUI>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon>resources\Main.ico</ApplicationIcon>
-        <StartupObject>TrainingModelOAuth.Startup.Program</StartupObject>
+        <StartupObject>TrainingModelIdentityProvider.Startup.Program</StartupObject>
         <WindowsPackageType>None</WindowsPackageType>
     </PropertyGroup>
 
@@ -42,7 +41,7 @@
 
     <ItemGroup>
       <ProjectReference Include="$(SolutionRoot)\Interfaces\Interfaces.csproj" />
-      <ProjectReference Include="$(SolutionRoot)\OAuthServer\OAuthServer.csproj" />
+      <ProjectReference Include="..\IdentityServer\IdentityServer.csproj" />
       <ProjectReference Include="$(SolutionRoot)\GUI\GUI.csproj" />
       <ProjectReference Include="..\Configuration\Configuration.csproj" />
     </ItemGroup>

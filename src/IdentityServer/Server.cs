@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 
-namespace TrainingModelOAuth;
+namespace TrainingModelIdentityProvider;
 
 public sealed class Server(IConfiguration configuration) : IServer
 {

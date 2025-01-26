@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <AssemblyName>TrainingModelOAuth.Server</AssemblyName>
+        <AssemblyName>TrainingModelIdentityProvider.Server</AssemblyName>
         <OutputType>Library</OutputType>
     </PropertyGroup>
 

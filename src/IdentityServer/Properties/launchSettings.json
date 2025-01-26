@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "OAuthServer": {
+    "IdentityProviderServer": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

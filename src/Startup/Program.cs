@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
-using TrainingModelOAuth.GUI;
+using TrainingModelIdentityProvider.GUI;
 
-namespace TrainingModelOAuth.Startup;
+namespace TrainingModelIdentityProvider.Startup;
 
 static class Program
 {
-	const string SingletonMutexName = "TrainingModelOAuth_Run_503A9F8E-6C05-4415-B4C7-035D19B3EA36";
+	const string SingletonMutexName = "TrainingModelIdentityProvider_Run_503A9F8E-6C05-4415-B4C7-035D19B3EA36";
 
 	[STAThread]
 	static void Main()

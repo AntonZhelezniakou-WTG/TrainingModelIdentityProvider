@@ -1,4 +1,4 @@
-namespace TrainingModelOAuth;
+namespace TrainingModelIdentityProvider;
 
 public sealed class Configuration : IConfiguration
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace TrainingModelOAuth;
+namespace TrainingModelIdentityProvider;
 
 static class Services
 {
