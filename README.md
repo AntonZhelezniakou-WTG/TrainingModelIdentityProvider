@@ -1,2 +1,2 @@
-# TrainingModelOAuth
-A simple OAuth implementation validating user login while working with the local OdysseyTrainingModel
+# TrainingModelIdentityProvider
+A simple OAuth identity provider implementation validating user login while working with the local OdysseyTrainingModel
