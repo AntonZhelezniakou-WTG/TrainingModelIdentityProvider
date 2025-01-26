@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <AssemblyName>TrainingModelOAuth.Interfaces</AssemblyName>
-    <OutputType>Library</OutputType>
-  </PropertyGroup>
-
+    <PropertyGroup>
+        <AssemblyName>TrainingModelOAuth.Interfaces</AssemblyName>
+        <OutputType>Library</OutputType>
+        <RootNamespace>TrainingModelOAuth</RootNamespace>
+    </PropertyGroup>
 </Project>

@@ -2,7 +2,8 @@ namespace TrainingModelOAuth;
 
 public interface IServer
 {
-	ServerConfiguration? ActiveConfiguration { get; }
+	ServerConfiguration? StartedConfiguration { get; }
+	bool Started { get; }
 
 	public void Start();
 	public void Stop();

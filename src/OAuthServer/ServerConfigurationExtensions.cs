@@ -7,19 +7,20 @@ static class ServerConfigurationExtensions
 {
 	public static ServerConfiguration GetValidated(this ServerConfiguration serverConfiguration)
 	{
-		if (string.IsNullOrWhiteSpace(serverConfiguration.StaffLoginName))
-			throw new InvalidOperationException($"{nameof(serverConfiguration.StaffLoginName)} can not be empty!");
-		if (serverConfiguration.ListeningPort is < 1024 or > 49151)
-			throw new InvalidOperationException($"{serverConfiguration.ListeningPort} port is out of allowed values range (1024 - 49151)!");
+		var configuration = serverConfiguration with { };
+		if (string.IsNullOrWhiteSpace(configuration.StaffLoginName))
+			throw new InvalidOperationException($"{nameof(configuration.StaffLoginName)} can not be empty!");
+		if (configuration.ListeningPort is < 1024 or > 49151)
+			throw new InvalidOperationException($"{configuration.ListeningPort} port is out of allowed values range (1024 - 49151)!");
 		try
 		{
-			using var tcpListener = new TcpListener(IPAddress.Any, serverConfiguration.ListeningPort);
+			using var tcpListener = new TcpListener(IPAddress.Any, configuration.ListeningPort);
 			tcpListener.Start();
 		}
 		catch (SocketException)
 		{
-			throw new InvalidOperationException($"Port {serverConfiguration.ListeningPort} is already in use!");
+			throw new InvalidOperationException($"Port {configuration.ListeningPort} is already in use!");
 		}
-		return serverConfiguration;
+		return configuration;
 	}
 }

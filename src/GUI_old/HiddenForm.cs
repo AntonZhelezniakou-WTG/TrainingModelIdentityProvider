@@ -19,7 +19,7 @@ public sealed class HiddenForm : Form
 		ShowInTaskbar = false;
 		Visible = false;
 
-		trayIcon = new NotifyIcon();
+		trayIcon = new();
 		trayIcon.Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!);
 		trayIcon.Text = "Tray Icon App";
 		trayIcon.Visible = true;

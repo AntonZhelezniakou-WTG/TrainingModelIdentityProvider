@@ -8,17 +8,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TrainingModelOAuth;
 
-public sealed class Server(IServerConfigurationProvider serverConfigurationProvider) : IServer
+public sealed class Server(IConfiguration configuration) : IServer
 {
 	const string ClientIdentifier = "OdysseyTrainingModel";
 	const int TokenLifetime = 1800;
 
 	public bool Started { get; private set; }
 
-	string ListeningAddress => $"https://localhost:{ActiveConfiguration!.ListeningPort}";
-	string StaffLoginName => ActiveConfiguration!.StaffLoginName;
+	string ListeningAddress => $"https://localhost:{StartedConfiguration!.ListeningPort}";
+	string StaffLoginName => StartedConfiguration!.StaffLoginName;
 
-	public ServerConfiguration? ActiveConfiguration { get; private set; }
+	public ServerConfiguration? StartedConfiguration { get; private set; }
 
 	IHost? host;
 
@@ -27,7 +27,7 @@ public sealed class Server(IServerConfigurationProvider serverConfigurationProvi
 
 	public void Start()
 	{
-		ActiveConfiguration = serverConfigurationProvider.GetConfiguration().GetValidated();
+		StartedConfiguration = configuration.ActiveServerConfiguration.GetValidated();
 
 		host = Host.CreateDefaultBuilder()
 			.ConfigureWebHostDefaults(webBuilder =>
@@ -83,7 +83,7 @@ public sealed class Server(IServerConfigurationProvider serverConfigurationProvi
 	public void Stop()
 	{
 		Started = false;
-		ActiveConfiguration = null;
+		StartedConfiguration = null;
 		host?.StopAsync().Wait(500);
 		host?.Dispose();
 		host = null;
